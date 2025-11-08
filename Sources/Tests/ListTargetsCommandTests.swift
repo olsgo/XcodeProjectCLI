@@ -65,6 +65,22 @@ extension SerializedSuite.ListTargetsCommandTests {
             try sut.run()
         }
     }
+
+    @Test
+    func listTargets_byFilePath_shouldWorkWithRelativeProjectPath() throws {
+        var sut = try ListTargetsCommand.parse([
+            testXcodeprojRelativePath,
+            "--file",
+            Files.Helpers.GeneralUtils.Subfolder2.stringExtensions
+        ])
+
+        let output = try runTest(for: &sut)
+
+        #expect(output == [
+            "Helpers",
+            "XcodebuildNvimApp"
+        ])
+    }
 }
 
 // MARK: List Targets by Group Path

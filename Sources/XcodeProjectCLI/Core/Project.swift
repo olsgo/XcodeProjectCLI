@@ -23,9 +23,10 @@ final class Project {
             throw CLIError.xcodeProjectNotFound
         }
 
-        Self.projectRoot = (projectPath as NSString).deletingLastPathComponent
+        let absoluteProjectPath = Self.absoluteProjectPath(from: projectPath)
+        Self.projectRoot = (absoluteProjectPath as NSString).deletingLastPathComponent
 
-        self.project = try XcodeProj(pathString: projectPath)
+        self.project = try XcodeProj(pathString: absoluteProjectPath)
         self.targets = ProjectTargets(project: project)
         self.groups = ProjectGroups(project: project)
         self.files = ProjectFiles(project: project)
@@ -35,5 +36,19 @@ final class Project {
         if let path = project.path {
             try project.write(path: path, override: true)
         }
+    }
+
+    private static func absoluteProjectPath(from path: String) -> String {
+        let expandedPath = NSString(string: path).expandingTildeInPath
+
+        if NSString(string: expandedPath).isAbsolutePath {
+            return URL(fileURLWithPath: expandedPath).standardizedFileURL.path
+        }
+
+        let currentDir = FileManager.default.currentDirectoryPath
+        let baseURL = URL(fileURLWithPath: currentDir, isDirectory: true)
+        return URL(fileURLWithPath: expandedPath, relativeTo: baseURL)
+            .standardizedFileURL
+            .path
     }
 }

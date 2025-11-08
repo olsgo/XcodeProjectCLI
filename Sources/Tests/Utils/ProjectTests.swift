@@ -5,8 +5,10 @@ import XcodeProj
 @testable import XcodeProjectCLI
 
 class ProjectTests {
+    let repoRoot: String
     let testProjectPath: String
     let testXcodeprojPath: String
+    let testXcodeprojRelativePath: String
 
     init() throws {
         let projectRoot = #filePath
@@ -14,10 +16,12 @@ class ProjectTests {
             .dropLast(4)
             .joined(separator: "/")
 
+        self.repoRoot = projectRoot
         let testPath = "\(projectRoot)/.test"
         let resourcesPath = "\(projectRoot)/TestResources"
         self.testProjectPath = "\(testPath)/XcodebuildNvimApp"
         self.testXcodeprojPath = "\(testProjectPath)/XcodebuildNvimApp.xcodeproj"
+        self.testXcodeprojRelativePath = testXcodeprojPath.replacingOccurrences(of: "\(projectRoot)/", with: "")
 
         try? FileManager.default.removeItem(atPath: testProjectPath)
         try FileManager.default.createDirectory(atPath: testPath, withIntermediateDirectories: true)
